@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MedBox</string>
+
+    <string name="notification_channel_name">İlaç Son Kullanma Uyarıları</string>
+    <string name="notification_channel_description">İlaçların son kullanma tarihi yaklaştığında veya geçtiğinde bildirim gönderir</string>
+    <string name="notification_title_expired">Son kullanma tarihi geçmiş ilaçlar var</string>
+    <string name="notification_title_expiring">Son kullanma tarihi yaklaşan ilaçlar var</string>
+</resources>
