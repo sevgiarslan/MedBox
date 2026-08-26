@@ -21,6 +21,18 @@ android {
         }
     }
 
+    signingConfigs {
+        getByName("debug") {
+            // Fixed, checked-in debug key so every build (local or CI) is signed the same way -
+            // otherwise each CI run's auto-generated debug key differs and Android refuses to
+            // install an update ("package conflicts with an existing package") until you uninstall.
+            storeFile = rootProject.file("keystore/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
