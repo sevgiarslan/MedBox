@@ -6,6 +6,9 @@ on:
       - claude/home-medicine-inventory-app-d8z1iq
   workflow_dispatch: {}
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,3 +36,15 @@ jobs:
         with:
           name: medbox-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Rename APK for release
+        run: cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/MedBox-debug.apk
+
+      - name: Publish to "latest-debug" release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest-debug
+          name: "MedBox (debug build)"
+          body: "En son otomatik debug derlemesi. Telefonda APK dosyasına dokunup kur."
+          make_latest: true
+          files: app/build/outputs/apk/debug/MedBox-debug.apk
