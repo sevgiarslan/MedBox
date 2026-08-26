@@ -17,12 +17,17 @@ data class MedicineEditorState(
     val medicineId: Long? = null,
     val name: String = "",
     val barcode: String = "",
-    val expirationDate: LocalDate = LocalDate.now().plusYears(1),
+    // Null until the user explicitly picks a date, or an existing medicine is loaded.
+    // A barcode only carries the product's identity, never its expiration date, so we must
+    // never guess one - a silent default here previously got mistaken for a real value.
+    val expirationDate: LocalDate? = null,
     val quantity: Int = 1,
     val notes: String = "",
     val selectedTagIds: Set<Long> = emptySet(),
     val isLoading: Boolean = true,
     val duplicateOfExistingId: Long? = null,
+    val showDateRequiredError: Boolean = false,
+    val barcodeCapturedHint: Boolean = false,
     val saved: Boolean = false,
     val deleted: Boolean = false
 )
@@ -69,7 +74,7 @@ class MedicineEditorViewModel(
     }
 
     fun onBarcodeScanned(value: String) {
-        _state.value = _state.value.copy(barcode = value)
+        _state.value = _state.value.copy(barcode = value, barcodeCapturedHint = true)
         viewModelScope.launch {
             val existing = repository.findByBarcode(value)
             if (existing != null && existing.medicine.id != _state.value.medicineId) {
@@ -78,12 +83,16 @@ class MedicineEditorViewModel(
         }
     }
 
+    fun dismissBarcodeCapturedHint() {
+        _state.value = _state.value.copy(barcodeCapturedHint = false)
+    }
+
     fun dismissDuplicateWarning() {
         _state.value = _state.value.copy(duplicateOfExistingId = null)
     }
 
     fun onExpirationDateChange(date: LocalDate) {
-        _state.value = _state.value.copy(expirationDate = date)
+        _state.value = _state.value.copy(expirationDate = date, showDateRequiredError = false)
     }
 
     fun onQuantityChange(quantity: Int) {
@@ -112,12 +121,17 @@ class MedicineEditorViewModel(
     fun save() {
         val s = _state.value
         if (s.name.isBlank()) return
+        val expirationDate = s.expirationDate
+        if (expirationDate == null) {
+            _state.value = s.copy(showDateRequiredError = true)
+            return
+        }
         viewModelScope.launch {
             val medicine = Medicine(
                 id = s.medicineId ?: 0,
                 name = s.name.trim(),
                 barcode = s.barcode.trim().ifBlank { null },
-                expirationDate = s.expirationDate,
+                expirationDate = expirationDate,
                 quantity = s.quantity,
                 notes = s.notes.trim()
             )
@@ -130,7 +144,7 @@ class MedicineEditorViewModel(
         val id = _state.value.medicineId ?: return
         viewModelScope.launch {
             repository.deleteMedicine(
-                Medicine(id = id, name = _state.value.name, expirationDate = _state.value.expirationDate)
+                Medicine(id = id, name = _state.value.name, expirationDate = LocalDate.now())
             )
             _state.value = _state.value.copy(deleted = true)
         }

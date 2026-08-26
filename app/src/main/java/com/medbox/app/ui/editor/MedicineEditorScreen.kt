@@ -32,6 +32,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -42,6 +44,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,7 +54,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.medbox.app.data.Tag
 import com.medbox.app.ui.components.TagFilterChip
+import kotlinx.coroutines.launch
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
@@ -70,6 +75,8 @@ fun MedicineEditorScreen(
     var showDatePicker by remember { mutableStateOf(false) }
     var showAddTagDialog by remember { mutableStateOf(false) }
     val isNew = state.medicineId == null
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(pendingScannedBarcode) {
         if (pendingScannedBarcode != null) {
@@ -78,11 +85,23 @@ fun MedicineEditorScreen(
         }
     }
 
+    LaunchedEffect(state.barcodeCapturedHint) {
+        if (state.barcodeCapturedHint) {
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(
+                    "Barkod numarası kaydedildi. İlaç adını ve son kullanma tarihini kutuya bakarak kendin gir."
+                )
+            }
+            viewModel.dismissBarcodeCapturedHint()
+        }
+    }
+
     LaunchedEffect(state.saved, state.deleted) {
         if (state.saved || state.deleted) onFinished()
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(if (isNew) "İlaç Ekle" else "İlacı Düzenle") },
@@ -156,13 +175,25 @@ fun MedicineEditorScreen(
                 )
             }
 
-            OutlinedButton(onClick = { showDatePicker = true }, modifier = Modifier.fillMaxWidth()) {
-                Text("Son Kullanma Tarihi: ${state.expirationDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))}")
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                OutlinedButton(onClick = { showDatePicker = true }, modifier = Modifier.fillMaxWidth()) {
+                    val dateText = state.expirationDate
+                        ?.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                        ?: "Kutudaki son kullanma tarihini seç"
+                    Text("Son Kullanma Tarihi: $dateText")
+                }
+                if (state.showDateRequiredError) {
+                    Text(
+                        "Kaydetmeden önce son kullanma tarihini seçmelisin.",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
 
             if (showDatePicker) {
                 val datePickerState = rememberDatePickerState(
-                    initialSelectedDateMillis = state.expirationDate
+                    initialSelectedDateMillis = (state.expirationDate ?: LocalDate.now())
                         .atStartOfDay(ZoneOffset.UTC)
                         .toInstant()
                         .toEpochMilli()
