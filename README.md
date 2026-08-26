@@ -9,6 +9,9 @@ Android için ev ilaç envanteri uygulaması. Kotlin + Jetpack Compose ile yazı
 - **Etiketleme**: Ağrı kesici, antibiyotik, çocuk için, vitamin gibi hazır etiketler + kendi etiketini oluşturma. Etikete göre filtreleme.
 - **Barkod ile tekrar-stok kısayolu**: CameraX + ML Kit ile kamerayı barkoda tutarak barkod numarasını okur ve barkod alanını doldurur. Bunun amacı isim/tarihi otomatik çekmek değil (genel, güvenilir bir ilaç barkod veritabanı yok) — asıl fayda, **aynı ürünü tekrar aldığında** barkodu tekrar okutunca uygulamanın "bu ürün zaten envanterde, mevcut kaydı güncellemek ister misin?" diye sorup seni doğrudan o kayda götürmesi; böylece isim/etiket gibi bilgileri yeniden yazmadan sadece miktarı ve yeni kutunun son kullanma tarihini güncelleyebilirsin. İlk ekleyişte ilaç adı ve son kullanma tarihi her zaman elle girilir.
 - **Son kullanma tarihi bildirimleri**: Günde bir kez arka planda (WorkManager) kontrol edilir; süresi dolmuş veya 30 gün içinde dolacak ilaçlar için bildirim gönderilir.
+- **Stok dashboard'u**: Ana ekranın üstünde toplam / süresi dolmuş / yakında dolacak ilaç sayıları gösterilir; birine dokununca liste o gruba filtrelenir.
+- **Silme**: Her ilaç satırında bir silme (çöp kutusu) ikonu var — ilacı attığında onaylayıp doğrudan envanterden düşürebilirsin.
+- **Dışa/İçe Aktarma**: Sağ üstteki menüden "Dışa Aktar" tüm listeyi bir JSON dosyası olarak Android'in paylaşım menüsüyle (WhatsApp, e-posta, Drive, Bluetooth vb.) başka biriyle paylaşmanı sağlar; "İçe Aktar" ise böyle bir dosyayı (kendi yedeğin ya da birinin paylaştığı liste) seçip mevcut envantere ekler. Etiketler isimle eşleştirilir/oluşturulur, mevcut kayıtların üzerine yazılmaz, sadece eklenir.
 
 ## Proje yapısı
 

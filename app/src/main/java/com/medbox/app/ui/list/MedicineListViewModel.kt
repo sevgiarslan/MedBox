@@ -89,4 +89,17 @@ class MedicineListViewModel(private val repository: MedicineRepository) : ViewMo
             repository.deleteMedicine(item.medicine)
         }
     }
+
+    /** Runs the JSON export off the main thread and hands the result back via [onExported]. */
+    fun exportAsJson(onExported: (String) -> Unit) {
+        viewModelScope.launch {
+            onExported(repository.exportAllAsJson())
+        }
+    }
+
+    fun importFromJson(json: String, onResult: (Result<Int>) -> Unit) {
+        viewModelScope.launch {
+            onResult(runCatching { repository.importFromJson(json) })
+        }
+    }
 }

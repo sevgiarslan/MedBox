@@ -17,6 +17,10 @@ interface MedicineDao {
     fun observeAllWithTags(): Flow<List<MedicineWithTags>>
 
     @Transaction
+    @Query("SELECT * FROM medicines ORDER BY expirationDate ASC")
+    suspend fun getAllWithTagsOnce(): List<MedicineWithTags>
+
+    @Transaction
     @Query("SELECT * FROM medicines WHERE id = :id")
     fun observeByIdWithTags(id: Long): Flow<MedicineWithTags?>
 
