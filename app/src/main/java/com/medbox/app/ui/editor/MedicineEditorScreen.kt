@@ -89,7 +89,7 @@ fun MedicineEditorScreen(
         if (state.barcodeCapturedHint) {
             coroutineScope.launch {
                 snackbarHostState.showSnackbar(
-                    "Barkod numarası kaydedildi. İlaç adını ve son kullanma tarihini kutuya bakarak kendin gir."
+                    "Barkod kaydedildi (bu ürünü tekrar aldığında hızlıca bulman için). İlaç adını ve son kullanma tarihini kutuya bakarak kendin gir."
                 )
             }
             viewModel.dismissBarcodeCapturedHint()
@@ -147,7 +147,7 @@ fun MedicineEditorScreen(
                 OutlinedTextField(
                     value = state.barcode,
                     onValueChange = viewModel::onBarcodeChange,
-                    label = { Text("Barkod (opsiyonel)") },
+                    label = { Text("Barkod (tekrar alımda hızlı bulmak için)") },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -160,17 +160,17 @@ fun MedicineEditorScreen(
             if (state.duplicateOfExistingId != null) {
                 AlertDialog(
                     onDismissRequest = viewModel::dismissDuplicateWarning,
-                    title = { Text("Bu ilaç zaten kayıtlı") },
-                    text = { Text("Bu barkoda sahip bir ilaç zaten envanterde var. Onu açmak ister misin, yoksa yeni bir kayıt olarak devam etmek mi istersin?") },
+                    title = { Text("Bu ürün zaten envanterde") },
+                    text = { Text("Bu barkodla daha önce eklediğin bir ilaç var. Yeni aldığın kutunun miktarını ve son kullanma tarihini o kayıtta mı güncellemek istersin, yoksa ayrı bir kayıt mı oluşturayım?") },
                     confirmButton = {
                         TextButton(onClick = {
                             val id = state.duplicateOfExistingId
                             viewModel.dismissDuplicateWarning()
                             if (id != null) onOpenExisting(id)
-                        }) { Text("Mevcut Kaydı Aç") }
+                        }) { Text("Mevcut Kaydı Güncelle") }
                     },
                     dismissButton = {
-                        TextButton(onClick = viewModel::dismissDuplicateWarning) { Text("Yeni Kayıt Olarak Devam Et") }
+                        TextButton(onClick = viewModel::dismissDuplicateWarning) { Text("Ayrı Yeni Kayıt Oluştur") }
                     }
                 )
             }

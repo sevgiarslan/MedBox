@@ -7,7 +7,7 @@ Android için ev ilaç envanteri uygulaması. Kotlin + Jetpack Compose ile yazı
 - **İlaç listesi**: Tüm ilaçlar son kullanma tarihine göre sıralı listelenir; süresi geçmiş/yaklaşan ilaçlar renkli rozetlerle vurgulanır.
 - **Arama**: İsme göre anlık arama.
 - **Etiketleme**: Ağrı kesici, antibiyotik, çocuk için, vitamin gibi hazır etiketler + kendi etiketini oluşturma. Etikete göre filtreleme.
-- **Barkod ile ekleme**: CameraX + ML Kit ile kamerayı barkoda tutarak barkod numarasını otomatik okuma (kutu üzerindeki barkodu okutup barkod alanını dolduruyor; ilaç adı/tarih/miktar elle giriliyor, çünkü genel bir ilaç barkod veritabanı yok). Aynı barkod tekrar okutulursa "bu ilaç zaten kayıtlı" uyarısı çıkar.
+- **Barkod ile tekrar-stok kısayolu**: CameraX + ML Kit ile kamerayı barkoda tutarak barkod numarasını okur ve barkod alanını doldurur. Bunun amacı isim/tarihi otomatik çekmek değil (genel, güvenilir bir ilaç barkod veritabanı yok) — asıl fayda, **aynı ürünü tekrar aldığında** barkodu tekrar okutunca uygulamanın "bu ürün zaten envanterde, mevcut kaydı güncellemek ister misin?" diye sorup seni doğrudan o kayda götürmesi; böylece isim/etiket gibi bilgileri yeniden yazmadan sadece miktarı ve yeni kutunun son kullanma tarihini güncelleyebilirsin. İlk ekleyişte ilaç adı ve son kullanma tarihi her zaman elle girilir.
 - **Son kullanma tarihi bildirimleri**: Günde bir kez arka planda (WorkManager) kontrol edilir; süresi dolmuş veya 30 gün içinde dolacak ilaçlar için bildirim gönderilir.
 
 ## Proje yapısı
@@ -39,7 +39,11 @@ APK'yı fiziksel telefona kurmak için (USB hata ayıklama açıkken):
 
 Gereksinimler: Android Studio (Koala veya üzeri) ya da JDK 17 + Android SDK (compileSdk 34) kurulu bir ortam. Kamera ve bildirim izinleri ilk açılışta istenir.
 
-> Not: Bu depo, internet erişimi olmayan bir bulut ortamında hazırlandı; bu yüzden burada `./gradlew assembleDebug` çalıştırılıp derleme doğrulanamadı (Android SDK ve Google Maven deposuna ağ erişimi yoktu). Kodun mantığı ve Gradle yapılandırması elle gözden geçirildi, ancak Android Studio'da ilk açılışta bağımlılıkların indirilmesini ve bir senkron/derlemeyi bekleyin; küçük bir sürüm uyuşmazlığı çıkarsa Android Studio önerilen düzeltmeyi otomatik sunar.
+### Bilgisayarsız kurulum (GitHub Actions)
+
+Bu depoda her push'ta debug APK'yı derleyen bir GitHub Actions iş akışı var (`.github/workflows/build-apk.yml`). Android Studio kurmadan, telefonda da kurulum yapılabilir:
+
+- Güncel APK: **[Releases → latest-debug](https://github.com/sevgiarslan/MedBox/releases/latest)** sayfasından `MedBox-debug.apk` dosyasını doğrudan indirip telefonda kurabilirsin ("bilinmeyen kaynaklardan yükleme" izni gerekir).
 
 ## Kullanılan teknolojiler
 
