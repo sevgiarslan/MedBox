@@ -18,6 +18,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.AlertDialog
@@ -121,7 +122,11 @@ fun MedicineEditorScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = viewModel::save) {
-                Icon(Icons.Default.Add, contentDescription = "Kaydet")
+                if (isNew) {
+                    Icon(Icons.Default.Add, contentDescription = "Kaydet")
+                } else {
+                    Icon(Icons.Default.Check, contentDescription = "Değişiklikleri Kaydet")
+                }
             }
         }
     ) { padding ->
